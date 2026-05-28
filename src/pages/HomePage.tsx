@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronRight, BookOpen, BarChart2, Trophy, AlertCircle } from 'lucide-react';
-import { subjects, chapters, problemTypes } from '../data/dummy';
+import { subjects, chapters } from '../data/dummy';
 import { useAppStore } from '../store/useAppStore';
 import ProblemCard from '../components/ProblemCard';
 
@@ -19,12 +19,6 @@ export default function HomePage() {
   const solved = problems.filter(p => p.status !== 'unsolved').length;
   const correct = problems.filter(p => p.status === 'correct' || p.status === 'corrected').length;
 
-  const typesForChapter = selectedChapterId
-    ? problemTypes.filter(t => t.chapterId === selectedChapterId)
-    : [];
-
-  const problemsForType = (typeId: string) =>
-    problems.filter(p => p.typeId === typeId);
 
   return (
     <div className="min-h-screen bg-zinc-950 text-white flex flex-col">
@@ -134,49 +128,26 @@ export default function HomePage() {
             </div>
           </div>
         ) : (
-          /* Problem grid by type */
-          <div className="space-y-10">
-            {typesForChapter.map(type => {
-              const typeProblems = problemsForType(type.id);
-              if (typeProblems.length === 0) return null;
-
-              return (
-                <section key={type.id}>
-                  {/* Section header */}
-                  <div className={`flex items-center gap-3 mb-4 ${type.isChallenge ? 'text-amber-400' : 'text-zinc-300'}`}>
-                    {type.isChallenge && (
-                      <Trophy size={16} className="text-amber-400" />
-                    )}
-                    <h3 className={`font-semibold ${type.isChallenge ? 'text-amber-400' : 'text-zinc-200'}`}>
-                      {type.name}
-                    </h3>
-                    <div className="flex-1 h-px bg-zinc-800" />
-                    <span className="text-xs font-mono text-zinc-600">
-                      {typeProblems.filter(p => p.status !== 'unsolved').length}/{typeProblems.length}
-                    </span>
-                  </div>
-
-                  {/* Legend */}
-                  <div className="flex items-center gap-4 mb-3 text-[11px] text-zinc-500">
-                    <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-zinc-500 inline-block" />미풀이</span>
-                    <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-red-500 inline-block" />오답</span>
-                    <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-emerald-500 inline-block" />정답</span>
-                    <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-blue-500 inline-block" />재도전 정답</span>
-                  </div>
-
-                  {/* Cards grid */}
-                  <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-7 gap-3">
-                    {typeProblems.map(problem => (
-                      <ProblemCard
-                        key={problem.id}
-                        problem={problem}
-                        onClick={() => navigate(`/problem/${problem.id}`)}
-                      />
-                    ))}
-                  </div>
-                </section>
-              );
-            })}
+          /* Problem grid by chapter */
+          <div>
+            <div className="flex items-center gap-4 mb-5 text-[11px] text-zinc-500">
+              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-zinc-500 inline-block" />미풀이</span>
+              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-red-500 inline-block" />오답</span>
+              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-emerald-500 inline-block" />정답</span>
+              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-blue-500 inline-block" />재도전 정답</span>
+            </div>
+            <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-7 gap-3">
+              {problems
+                .filter(p => p.chapterId === selectedChapterId)
+                .sort((a, b) => a.number - b.number)
+                .map(problem => (
+                  <ProblemCard
+                    key={problem.id}
+                    problem={problem}
+                    onClick={() => navigate(`/problem/${problem.id}`)}
+                  />
+                ))}
+            </div>
           </div>
         )}
       </main>

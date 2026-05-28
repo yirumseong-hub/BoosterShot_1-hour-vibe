@@ -53,7 +53,7 @@ export default function ProblemPage() {
   }
 
   function handleSubmit() {
-    if (selectedAnswer === null) return;
+    if (selectedAnswer === null || !problem) return;
     if (timerRef.current) clearInterval(timerRef.current);
 
     const correct = selectedAnswer === problem.correctAnswer;
